@@ -1998,7 +1998,7 @@
     Object.keys(state.elements).forEach(function (name) {
       var style = state.styles[name] || {};
       var attributes = state.attributes[name] || {};
-      var element = state.elements[name]; // arrow is optional + virtual elements
+      var element = state.elements[name]; // arrow is optional + elements
 
       if (!isHTMLElement(element) || !getNodeName(element)) {
         return;
@@ -2050,7 +2050,7 @@
         var style = styleProperties.reduce(function (style, property) {
           style[property] = '';
           return style;
-        }, {}); // arrow is optional + virtual elements
+        }, {}); // arrow is optional + elements
 
         if (!isHTMLElement(element) || !getNodeName(element)) {
           return;
@@ -3267,7 +3267,7 @@
       var arrowPaddingMax = arrowPaddingObject[altSide]; // If the reference length is smaller than the arrow length, we don't want
       // to include its full size in the calculation. If the reference is small
       // and near the edge of a boundary, the popper can overflow even if the
-      // reference is not overflowing as well (e.g. virtual elements with no
+      // reference is not overflowing as well (e.g. elements with no
       // width or height)
 
       var arrowLen = within(0, referenceRect[len], arrowRect[len]);
@@ -3898,7 +3898,7 @@
       typeCheckConfig(NAME$9, config, this.constructor.DefaultType);
 
       if (typeof config.reference === 'object' && !isElement$1(config.reference) && typeof config.reference.getBoundingClientRect !== 'function') {
-        // Popper virtual elements require a getBoundingClientRect method
+        // Popper elements require a getBoundingClientRect method
         throw new TypeError(`${NAME$9.toUpperCase()}: Option "reference" provided type "object" without a required "getBoundingClientRect" method.`);
       }
 
