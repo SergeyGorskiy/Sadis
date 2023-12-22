@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Sadis.Web.Controllers
+namespace Sadis.Web.Areas.Operator.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,0 +1,226 @@
+﻿@model RoadObjectsFullVM
+<div class="container">
+    <div class="row pt-3 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary pt-2">Объекты содержания</h2>
+        </div>
+        <div class="col-6 text-end">
+           @*  <a asp-area="Operator" asp-controller="RoadObjects" asp-action="Create" class="btn btn-primary">Создать объект содержания</a> *@
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">
+                Создать объект содержания
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <label>Район:</label>
+        <select id="regionSelector" asp-items="Model.Regions" onchange="onChangeRegion(this, model)">
+            <option selected value="-1">--По всем регионам--</option>
+        </select>
+    </div>
+    <div class="row">
+        <label>Дорога:</label>
+        <select id="roadSelector" asp-items="Model.Roads" onchange="onChangeRoad(this, model)">
+            <option selected value="-1">--По всем дорогам--</option>
+        </select>
+    </div>
+
+    <table id="roadObjectsTable" class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Инструменты</th>
+                <th>Тип объекта</th>
+                <th>Район</th>
+                <th>Автомобильная дорога</th>
+                <th>Наименование объекта содержания</th>
+                <th>Код объекта</th>
+                <th>Начало, км</th>
+                <th>Конец, км</th>
+                <th>Экспл. категория</th>
+                <th>В журнале</th>
+            </tr>
+        </thead>
+        <tbody id="roadObjectsBody">
+            @foreach (var obj in Model.ObjectVMs)
+            {
+                <tr>
+                    <td>
+                        <div class="w-75 btn-group" role="group">
+                            @* <a asp-area="Operator" asp-controller="RoadObjects" asp-action="Edit" asp-route-id="@obj.C_OBJECT" class="btn btn-primary mx-2">
+                                Изм
+                            </a> *@
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate" onclick="updateObjectOnClick(@obj.C_OBJECT, model)">
+                                Изм
+                            </button>
+                            <a asp-area="Operator" asp-controller="RoadObjects" asp-action="Delete" asp-route-id="@obj.C_OBJECT" class="btn btn-danger mx-2">
+                                Удал
+                            </a>
+                        </div>
+                    </td>
+                    <td>@obj.N_TYPE_OBJECT</td>
+                    <td>@obj.N_REGION</td>
+                    <td>@obj.N_ROAD</td>
+                    <td>@obj.N_OBJECT</td>
+                    <td>@obj.CODE</td>
+                    <td>@obj.BEGKM</td>
+                    <td>@obj.ENDKM</td>
+                    <td>@obj.N_EXPL_CATEGORY</td>
+                    <td>@obj.ENABLED_FOR_JORNAL_STR</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="modal fade" id="modalCreate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Создать объект содержания</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" class="row" asp-area="Operator" asp-controller="RoadObjects" asp-action="Upsert">
+                        <input id="objIdInput" asp-for="ObjectVM.C_OBJECT" hidden />
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Тип объекта</label>
+                            <select class="form-select form-select-sm" id="modalTypeObjSelector" asp-for="ObjectVM.C_TYPE_OBJECT" 
+                            asp-items="Model.TypeObjects" onchange="onChangeTypeObject(this)">
+                                <option disabled selected value="-1">--Выберите тип объекта--</option>
+                            </select>
+                            <span asp-validation-for="ObjectVM.C_TYPE_OBJECT" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" asp-for="ObjectVM.ENABLED_FOR_JORNAL" id="modalEnableJournalCheck">
+                                <label class="form-check-label">Отображать в журнале</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Регион</label>
+                            <select class="form-select form-select-sm" id="modalRegionSelector" asp-for="ObjectVM.C_REGION" asp-items="Model.Regions" 
+                            onchange="modalRegionOnChange(this, model)">
+                                <option disabled selected value="-1">--Выберите регион--</option>
+                            </select>
+                            <span asp-validation-for="ObjectVM.C_REGION" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Дорога</label>
+                            <select class="form-select form-select-sm" id="modalRoadSelector" asp-for="ObjectVM.C_ROAD" asp-items="Model.Roads">
+                                <option disabled selected value="-1">--Выберите дорогу--</option>
+                            </select>
+                            <span asp-validation-for="ObjectVM.C_ROAD" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Наименование объекта</label>
+                            <input class="form-control form-control-sm" id="modalNameObjectInput" asp-for="ObjectVM.N_OBJECT" placeholder="Введите наименование">
+                            <span asp-validation-for="ObjectVM.N_OBJECT" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Инвентарный номер</label>
+                            <input class="form-control form-control-sm" id="modalCodeObjectInput" asp-for="ObjectVM.CODE" placeholder="Введите инвентарный номер">
+                            <span asp-validation-for="ObjectVM.CODE" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Дата ввода в эксплуатацию:</label>
+                            <input class="form-control form-control-sm" id="modalDateLeadIn" type="date" asp-for="ObjectVM.DATE_LEAD_IN" asp-format="{0:dd-MM-yyyy}" />
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Дата вывода из эксплуатации:</label>
+                            <input class="form-control form-control-sm" id="modalDateLeadOut" type="date" asp-for="ObjectVM.DATE_LEAD_OUT" asp-format="{0:dd-MM-yyyy}" />
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Эксплуатационная категория</label>
+                            <select class="form-select form-select-sm" id="modalExplCategorySelector" asp-for="ObjectVM.C_EXPL_CATEGORY" asp-items="Model.ExplCategories">
+                                <option disabled selected value="-1">--Выберите категорию--</option>
+                            </select>
+                            <span asp-validation-for="ObjectVM.C_EXPL_CATEGORY" class="text-danger"></span>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Статус объекта</label>
+                            <select class="form-select form-select-sm" id="modalStatusSelector" asp-for="ObjectVM.C_STATUS_OBJECT" asp-items="Model.Statuses">
+                                <option disabled selected value="-1">--Выберите статус--</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Протяженность</label>
+                            <input class="form-control form-control-sm" id="modalObjectLength" asp-for="ObjectVM.LENGTH" type="number">
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Климатическая зона</label>
+                            <input class="form-control form-control-sm" id="modalClimateZone" asp-for="ObjectVM.MP" disabled>
+                        </div>
+
+                        <div class="col-12" id="modalBridgeCard" style="display:none">
+                            <div class="card mt-2">
+                                <div class="card-header">
+                                    Характеристики моста
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label class="col-form-label col-form-label-sm">Тип мостового сооружения</label>
+                                            <select class="form-select form-select-sm" id="modalBridgeType" asp-for="ObjectVM.C_TYPE_BRIDGE" asp-items="Model.BridgeTypes">
+                                                <option disabled selected value="-1">--Выберите тип--</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="col-form-label col-form-label-sm">Материал</label>
+                                            <select class="form-select form-select-sm" id="modalBridgeMaterial" asp-for="ObjectVM.C_BRIDGE_MATERIAL" asp-items="Model.BridgeMaterials">
+                                                <option disabled selected value="-1">--Выберите материал--</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="col-form-label col-form-label-sm">Пересекаемое препятствие</label>
+                                            <input class="form-control form-control-sm" id="modalBridgeBarrier" asp-for="ObjectVM.BARRIER">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="col-form-label col-form-label-sm">Габарит</label>
+                                            <input class="form-control form-control-sm" id="modalBridgeGabarit" asp-for="ObjectVM.GABARIT">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label class="col-form-label col-form-label-sm">Километровые столбы</label>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Начало участка</label>
+                            <input class="form-control form-control-sm" id="modalBegKmStolb" asp-for="ObjectVM.BEGKM_STOLB">
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Конец участка</label>
+                            <input class="form-control form-control-sm" id="modalEndKmStolb" asp-for="ObjectVM.ENDKM_STOLB">
+                        </div>
+                        <div class="col-12">
+                            <label class="col-form-label col-form-label-sm">Сквозной километраж</label>
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Начало участка</label>
+                            <input class="form-control form-control-sm" id="modalBegKm" asp-for="ObjectVM.BEGKM" class="form-control" type="number">
+                        </div>
+                        <div class="col-6">
+                            <label class="col-form-label col-form-label-sm">Конец участка</label>
+                            <input class="form-control form-control-sm" id="modalEndKm" asp-for="ObjectVM.ENDKM" class="form-control" type="number">
+                        </div>
+                        <div class="col-12 mt-2">
+                            <button id="createBtn" type="submit" class="btn btn-primary">Создать</button>
+                            <button id="updateBtn" type="submit" class="btn btn-primary">Сохранить</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var model = @Html.Raw(JsonSerializer.Serialize(Model.ObjectVMs));
+    // window.onload = function () {
+    //     startPage(model);
+    // };
+</script>
+@section Scripts{
+    <script src="~/js/roadObjects.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}
+

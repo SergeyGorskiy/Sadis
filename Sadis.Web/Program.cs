@@ -1,12 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Sadis.DAL.Data;
+using Sadis.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.ConfigureSqlServerContext(builder.Configuration);
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<SmetaContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("SmetaContextConnection")));
-
 
 
 var app = builder.Build();
@@ -26,6 +23,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Operator}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
