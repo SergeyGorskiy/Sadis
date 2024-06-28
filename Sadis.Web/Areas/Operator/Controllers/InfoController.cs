@@ -16,8 +16,7 @@ namespace Sadis.Web.Areas.Operator.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var contracts = 
-                await _smetaContext.DContracts
+            var contracts = await _smetaContext.DContracts
                 .Select(c => new {
                     C_CONTRACT = c.CContract,
                     N_CONTRACT = c.NContract,

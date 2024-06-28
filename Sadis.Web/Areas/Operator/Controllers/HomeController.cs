@@ -16,10 +16,5 @@ namespace Sadis.Web.Areas.Operator.Controllers
         {
             return View();
         }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
     }
 }

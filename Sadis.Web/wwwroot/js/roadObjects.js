@@ -1,25 +1,39 @@
-﻿function startPage(model) {
-    let regionSelector = document.getElementById("regionSelector");
-    let regions = model.map(m => [ m.C_REGION, m.N_REGION ]);
-    let uniqueRegions = getDistinct(regions);
-    createOptions(regionSelector, uniqueRegions)
+﻿$(function () {
+    roadObjectsTable.style.display = "block";
+    new DataTable("#roadObjectsTable");
+});
 
-    let roadSelector = document.getElementById("roadSelector");
-    let roads = model.map(m => [m.C_ROAD, m.N_ROAD]);
-    let uniqueRoads = getDistinct(roads);
-    createOptions(roadSelector, uniqueRoads)
+function createObjectOnClick() {
+    objIdInput.value = null;
+    modalTypeObjSelector.value = "-1";
+    modalEnableJournalCheck.checked = false;
+    modalRegionSelector.value = "-1";
+    modalRoadSelector.value = "-1";
+    modalNameObjectInput.value = null;
+    modalCodeObjectInput.value = null;
+    modalDateLeadIn.value = null;
+    modalDateLeadOut.value = null;
+    modalExplCategorySelector.value = "-1";
+    modalStatusSelector.value = "-1";
+    modalObjectLength.value = null;
+    modalClimateZone.value = null;
+    modalBridgeCard.style.display = "none";
+    modalBridgeType.value = "-1";
+    modalBridgeMaterial.value = "-1";
+    modalBridgeBarrier.value = null;
+    modalBridgeGabarit.value = null;
+    modalBegKmStolb.value = null;
+    modalEndKmStolb.value = null;
+    modalBegKm.value = null;
+    modalEndKm.value = null;
+    createBtn.style.display = "inline";
+    updateBtn.style.display = "none";
 }
 
-//document.addEventListener('DOMContentLoaded', function () {
-//    let myBtn = document.getElementById('customBtn');
-//    myBtn.addEventListener('click', () => {
-//        console.log("работает");
-//    })
-//    const myModal = document.getElementById("modalCreate")
-//    myModal.addEventListener('shown.bs.modal', () => {
-//        console.log("видим модал");
-//    })
-//});
+function deleteObjectOnClick(objId, model) {
+    let obj = model.find((m) => m.C_OBJECT === objId);
+    modalDeleteLabel.innerHTML = "Вы действительно хотите удалить объект: " + obj.CODE + " " + obj.N_OBJECT + "?";
+}
 
 function updateObjectOnClick(objId, model) {
     let obj = model.find((m) => m.C_OBJECT === objId);
@@ -65,6 +79,9 @@ function modalRegionOnChange(id, model) {
     removeOptions(modalRoadSelector);
     createOptions(modalRoadSelector, uniqueRoads);
     modalRoadSelector.value = "-1";
+
+    let climatZone = filtered.map(m => [m.NAME_CLIMAT_ZONE])[0];
+    modalClimateZone.value = climatZone;
 }
 
 function onChangeRegion(id, model) {
@@ -78,7 +95,7 @@ function onChangeRegion(id, model) {
     removeOptions(roadSelector);
     createOptions(roadSelector, uniqueRoads);
     roadSelector.value = "-1";
-    fillTable(filtered)
+    createTable(filtered)
 }
 
 function onChangeRoad(id, model) {
@@ -89,7 +106,7 @@ function onChangeRoad(id, model) {
         filterByRegion = filterByRegion.filter((m) => m.C_REGION === regionId);
     }
     let filterByRoad = filterByRegion.filter((m) => m.C_ROAD === roadId);
-    fillTable(filterByRoad)
+    createTable(filterByRoad)
 }
 
 function onChangeTypeObject(id) {
@@ -132,16 +149,34 @@ function removeOptions(selector) {
     }
 }
 
-function fillTable(filteredModel) {
-    $('#roadObjectsTable > tbody > tr').remove();
-    filteredModel.forEach(function (element) {
+function createTable(model) {
+    var table = new DataTable("#roadObjectsTable");
+    table.destroy();
+    $("#roadObjectsTable > tbody > tr").remove();
+
+    model.forEach(function (element) {
         let tr = roadObjectsBody.insertRow(-1);
         let tabCell = tr.insertCell(-1);
-        tabCell.innerHTML =
-            '<div class="w-75 btn-group" role="group">'
-               +'<a asp-area="Operator" asp-controller="RoadObjects" asp-action="Edit" asp-route-id="@obj.C_OBJECT" class="btn btn-primary mx-2">Изм</a>'
-               +'<a asp-area="Operator" asp-controller="RoadObjects" asp-action="Delete" asp-route-id="@obj.C_OBJECT" class="btn btn-danger mx-2">Удал</a>'
-            +'</div>';
+        let div = document.createElement("div");
+        div.classList.add("w-75", "btn-group");
+        div.role = "group";
+        let btnUpdate = document.createElement("button");
+        btnUpdate.classList.add("btn", "btn-primary");
+        btnUpdate.setAttribute("type", "button");
+        btnUpdate.setAttribute("data-bs-toggle", "modal");
+        btnUpdate.setAttribute("data-bs-target", "#modalCreate");
+        btnUpdate.setAttribute("onclick", "updateObjectOnClick(" + element.C_OBJECT + ", model)");
+        btnUpdate.innerText = "Изм";
+        div.appendChild(btnUpdate);
+        let btnDelete = document.createElement("button");
+        btnDelete.classList.add("btn", "btn-danger");
+        btnDelete.setAttribute("type", "button");
+        btnDelete.setAttribute("data-bs-toggle", "modal");
+        btnDelete.setAttribute("data-bs-target", "#modalDelete");
+        btnDelete.setAttribute("onclick", "deleteObjectOnClick(" + element.C_OBJECT + ", model)");
+        btnDelete.innerText = "Удал";
+        div.appendChild(btnDelete);
+        tabCell.appendChild(div);
         tabCell = tr.insertCell(-1);
         tabCell.innerHTML = element.N_TYPE_OBJECT;
         tabCell = tr.insertCell(-1);
@@ -160,5 +195,26 @@ function fillTable(filteredModel) {
         tabCell.innerHTML = element.N_EXPL_CATEGORY;
         tabCell = tr.insertCell(-1);
         tabCell.innerHTML = element.ENABLED_FOR_JORNAL_STR;
+    })
+    new DataTable("#roadObjectsTable");
+}
+
+function fillDataTable(model) {
+    var table = new DataTable("#roadObjectsTable");
+    table.clear().draw();
+
+    model.forEach(function (element) {
+        table.row.add({
+            "инструменты": "Кнопки",
+            "тип объекта": element.N_TYPE_OBJECT,
+            "район": element.N_REGION,
+            "автомобильная дорога": element.N_ROAD,
+            "наименование объекта содержания": element.N_OBJECT,
+            "код объекта": element.CODE,
+            "начало, км": element.BEGKM,
+            "конец, км": element.ENDKM,
+            "экспл. категория": element.N_EXPL_CATEGORY,
+            "в журнале": element.ENABLED_FOR_JORNAL_STR
+        }).draw();
     })
 }

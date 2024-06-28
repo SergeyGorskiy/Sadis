@@ -1,33 +1,34 @@
 ﻿@model List<InfoVM>
-<div class="container">
-    <div class="row pt-3 pb-3">
-        <div class="col-6">
-            <h2 class="text-primary pt-2">Информация</h2>
-        </div>
+<div class="row pt-3 pb-3">
+    <div class="col-6">
+        <h2 class="text-primary pt-2">Информация</h2>
     </div>
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Наименование контракта</th>
-                <th>Наименование блока</th>
-                <th>Подрядчик</th>
-                <th>Номер ген.контракта</th>
-                <th>Генподрядчик</th>
-                <th>Анализ</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var obj in Model)
-            {
-                <tr>
-                    <td>@obj.N_CONTRACT</td>
-                    <td>@obj.N_BLOCK</td>
-                    <td>@obj.N_CONTRACTOR</td>
-                    <td>@obj.N_GENERAL_CONTRACT</td>
-                    <td>@obj.N_GENERAL_CONTRACTOR</td>
-                    <td>Анализ</td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>
+<table id="tblInfo" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Наименование контракта</th>
+            <th>Наименование блока</th>
+            <th>Подрядчик</th>
+            <th>Номер ген.контракта</th>
+            <th>Генподрядчик</th>
+            <th>Анализ</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model)
+        {
+            <tr>
+                <td>@obj.N_CONTRACT</td>
+                <td>@obj.N_BLOCK</td>
+                <td>@obj.N_CONTRACTOR</td>
+                <td>@obj.N_GENERAL_CONTRACT</td>
+                <td>@obj.N_GENERAL_CONTRACTOR</td>
+                <td>Анализ</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts{
+    <script src="~/js/info.js"></script>
+}

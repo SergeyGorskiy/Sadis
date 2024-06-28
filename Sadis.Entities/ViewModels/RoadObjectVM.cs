@@ -2,7 +2,7 @@
 
 namespace Sadis.Entities.ViewModels
 {
-    public class RoadObjectsVM
+    public class RoadObjectVM
     {
         public int C_OBJECT { get; set; }
         public int? C_BRIDGE_OBJECT { get; set; }
@@ -44,5 +44,6 @@ namespace Sadis.Entities.ViewModels
         public double? MP { get; set; }
         public double? COEF { get; set; }
         public string? N_BRIDGE_LET { get; set; }
+        public string? NAME_CLIMAT_ZONE { get; set; }
     }
 }

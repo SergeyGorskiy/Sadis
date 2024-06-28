@@ -1,0 +1,101 @@
+﻿@model RoadObjectRegionFullVM
+<div class="row pt-2 pb-2">
+    <div class="col-6">
+        <h2 class="text-primary pt-2">Районы</h2>
+    </div>
+    <div class="col-6 text-end">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">
+            Добавить район
+        </button>
+    </div>
+</div>
+
+<table id="regionsTable" class="table table-bordered table-striped" style="display:none">
+    <thead>
+        <tr>
+            <th>Инструменты</th>
+            <th>Наименование района</th>
+            <th>Коэф. надбавки к зарплате</th>
+            <th>Климатическая зона</th>
+        </tr>
+    </thead>
+    <tbody id="regionsBody">
+        @foreach (var obj in Model.RegionVMs)
+        {
+            <tr>
+                <td>
+                    <div class="w-75 btn-group" role="group">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate" onclick="updateRegionOnClick(@obj.C_REGION, model)">Изм</button>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalDelete" onclick="deleteRegionOnClick(@obj.C_REGION, model)">Удал</button>
+                    </div>
+                </td>
+                <td>@obj.N_REGION</td>
+                <td>@obj.COEF_SALARY</td>
+                <td>@obj.N_CLIMAT_ZONE</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="modal fade" id="modalCreate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Создать регион</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="post" class="row" asp-area="Operator" asp-controller="RoadObjectRegion" asp-action="Upsert">
+                    <input id="regionIdInput" asp-for="RegionVM.C_REGION" hidden />
+                    <div class="col-12">
+                        <label class="col-form-label col-form-label-sm">Наименование района</label>
+                        <input class="form-control form-control-sm" id="modalNameRegionInput" asp-for="RegionVM.N_REGION" placeholder="Введите наименование">
+                        <span asp-validation-for="RegionVM.N_REGION" class="text-danger"></span>
+                    </div>
+                    <div class="col-6">
+                        <label class="col-form-label col-form-label-sm">Коэф. надбавки к зарплате</label>
+                        <input class="form-control form-control-sm" id="modalCoefSalaryInput" asp-for="RegionVM.COEF_SALARY" type="number">
+                        <span asp-validation-for="RegionVM.COEF_SALARY" class="text-danger"></span>
+                    </div>
+                    <div class="col-6">
+                        <label class="col-form-label col-form-label-sm">Климатическая зона</label>
+                        <select class="form-select form-select-sm" id="modalClimateZoneSelector" asp-for="RegionVM.C_CLIMAT_ZONE" asp-items="Model.ClimateZones">
+                            <option disabled selected value="-1">--Выберите климатическую зону--</option>
+                        </select>
+                        <span asp-validation-for="RegionVM.C_CLIMAT_ZONE" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-12 mt-2">
+                        <button id="createBtn" type="submit" class="btn btn-primary">Создать</button>
+                        <button id="updateBtn" type="submit" class="btn btn-primary">Сохранить</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalDelete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Удаление региона</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label id="modalDeleteLabel"></label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Удалить</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        var model = @Html.Raw(JsonSerializer.Serialize(Model.RegionVMs));
+    </script>
+    <script src="~/js/roadObjectRegion.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+}
+

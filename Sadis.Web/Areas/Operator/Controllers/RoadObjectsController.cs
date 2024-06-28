@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Sadis.DAL.Data;
 using Sadis.Entities.Models;
 using Sadis.Entities.ViewModels;
-using System.Drawing;
 
 namespace Sadis.Web.Areas.Operator.Controllers
 {
@@ -19,7 +18,7 @@ namespace Sadis.Web.Areas.Operator.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult>  Index()
+        public async Task<IActionResult> Index()
         {
             var objects = await _smetaContext.DObjects
                 .Select(o => new
@@ -31,6 +30,9 @@ namespace Sadis.Web.Areas.Operator.Controllers
                     CODE = o.Code,
                     BEGKM = o.Begkm,
                     ENDKM = o.Endkm,
+                    LENGTH = o.Length,
+                    BEGKM_STOLB = o.BegkmStolb,
+                    ENDKM_STOLB = o.EndkmStolb,
                     ENABLED_FOR_JORNAL = o.EnabledForJornal,
                     C_REGION = o.CRegion,
                     N_REGION = o.CRegionNavigation.NRegion,
@@ -43,7 +45,10 @@ namespace Sadis.Web.Areas.Operator.Controllers
                     N_EXPL_CATEGORY = o.CExplCategoryNavigation.NExplCategory,
                     C_STATUS_OBJECT = o.CStatusObject,
                     C_TYPE_BRIDGE = o.CTypeBridge,
-                    C_BRIDGE_MATERIAL = o.CBridgeMaterial
+                    C_BRIDGE_MATERIAL = o.CBridgeMaterial,
+                    BARRIER = o.Barrier,
+                    GABARIT = o.Gabarit,
+                    NAME_CLIMAT_ZONE = o.CRegionNavigation.CClimatZoneNavigation.NameClimatZone
                 }).AsNoTracking().ToListAsync();
 
             var typeObjects = await _smetaContext.STypeObjects
@@ -81,20 +86,23 @@ namespace Sadis.Web.Areas.Operator.Controllers
                     NBridgeMaterial = t.NBridgeMaterial
                 }).AsNoTracking().ToListAsync();
 
-            List<RoadObjectsVM> objectsVMs = new();
+            List<RoadObjectVM> objectsVMs = new();
             if (objects.Any())
             {
                 //string input = "http://www.somesite.com/somepage.aspx?whatever";
                 //int index = input.IndexOf("?");
                 //if (index >= 0) input = input.Substring(0, index + 4);
 
-                objectsVMs = objects.Select(o => new RoadObjectsVM
+                objectsVMs = objects.Select(o => new RoadObjectVM
                 {
                     C_OBJECT = o.C_OBJECT,
                     N_OBJECT = o.N_OBJECT,
                     CODE = o.CODE,
                     BEGKM = o.BEGKM,
                     ENDKM = o.ENDKM,
+                    LENGTH = o.LENGTH,
+                    BEGKM_STOLB = o.BEGKM_STOLB,
+                    ENDKM_STOLB = o.ENDKM_STOLB,
                     ENABLED_FOR_JORNAL = o.ENABLED_FOR_JORNAL == 1,
                     ENABLED_FOR_JORNAL_STR = o.ENABLED_FOR_JORNAL == 1 ? "ДА" : "НЕТ",
                     C_REGION = o.C_REGION,
@@ -108,15 +116,18 @@ namespace Sadis.Web.Areas.Operator.Controllers
                     N_EXPL_CATEGORY = o.N_EXPL_CATEGORY,
                     C_STATUS_OBJECT = o.C_STATUS_OBJECT,
                     C_TYPE_BRIDGE = o.C_TYPE_BRIDGE,
-                    C_BRIDGE_MATERIAL = o.C_BRIDGE_MATERIAL
+                    C_BRIDGE_MATERIAL = o.C_BRIDGE_MATERIAL,
+                    BARRIER = o.BARRIER,
+                    GABARIT = o.GABARIT,
+                    NAME_CLIMAT_ZONE = o.NAME_CLIMAT_ZONE
                 }).ToList();
             }
 
             var regions = objectsVMs.Select(vm => new { vm.C_REGION, vm.N_REGION }).Distinct();
             var roads = objectsVMs.Select(vm => new { vm.C_ROAD, vm.NAME_ROAD }).Distinct();
-            RoadObjectsFullVM objectsFullVM = new()
+            RoadObjectFullVM objectsFullVM = new()
             {
-                ObjectVM = new RoadObjectsVM(),
+                ObjectVM = new RoadObjectVM(),
                 TypeObjects = new SelectList(typeObjects, "CTypeObject", "NTypeObject"),
                 Regions = new SelectList(regions, "C_REGION", "N_REGION"),
                 Roads = new SelectList(roads, "C_ROAD", "NAME_ROAD"),
@@ -131,13 +142,13 @@ namespace Sadis.Web.Areas.Operator.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upsert(RoadObjectsVM objectVm)
+        public async Task<IActionResult> Upsert(RoadObjectVM objectVm)
         {
             if (ModelState.IsValid)
             {
                 if (objectVm.C_OBJECT == 0)
                 {
-                    DObject dObject = new ();
+                    DObject dObject = new();
                     dObject.CBridgeObject = objectVm.C_BRIDGE_OBJECT;
                     dObject.CTypeObject = objectVm.C_TYPE_OBJECT;
                     dObject.CRegion = objectVm.C_REGION;

@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Sadis.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/datatables.min.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Sadis.Web</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -18,25 +19,35 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Operator" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="Operator" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Operator" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="Operator" asp-controller="Info" asp-action="Index">Информация</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Operator" asp-controller="Info" asp-action="Index">Информация</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Объекты содержания</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Объекты дорожного хозяйства
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Районы</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Автомобильные дороги</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Объекты содержания</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Кураторы объектов</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Перемещение элементов на объекты</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Элементы на объекте</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Разделение объектов содержания</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Объединение объектов содержания</a></li>
+                                <li><a class="dropdown-item" asp-area="Operator" asp-controller="RoadObjects" asp-action="Index">Дополнительные работы</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container-fluid">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
@@ -50,6 +61,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/datatables.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
